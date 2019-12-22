@@ -13,6 +13,7 @@ class Teleporteur_local(Case_speciale):
         else:
             self.skin = len(SKIN_CASES)
             SKIN_CASES.append(Skin_case("case.png",self.couleur))
+            SKIN_CASES[len(SKIN_CASES)-1].resize((40,40))
 
     def execute(self,entitee):
         """

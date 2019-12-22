@@ -17,6 +17,7 @@ class Case:
         else:
             self.skin = len(SKIN_CASES)
             SKIN_CASES.append(Skin_case("case.png",self.couleur))
+            SKIN_CASES[len(SKIN_CASES)-1].resize((40,40))
     def nb_murs_pleins(self):
         """
         Fonction qui renvoie le nombre de murs pleins dans la case
@@ -90,6 +91,7 @@ class Case:
         self.couleur=couleur
         self.skin = len(SKIN_CASES)
         SKIN_CASES.append(Skin_case("case.png",self.couleur))
+        SKIN_CASES[self.skin].resize((40,40))
     def toString(self):
         return "haut "+str(self.murs[0].get_etat())+" droite "+str(self.murs[1].get_etat())+" bas "+str(self.murs[2].get_etat())+" gauche "+str(self.murs[3].get_etat())+"  "
 #case=Case(5,52)

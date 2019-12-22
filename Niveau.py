@@ -21,7 +21,7 @@ from Projectiles import *
 
 class Niveau:
     def __init__(self,niveau,difficulte,mode_affichage,mode_minimap,destination=None,debut_niveau=False,joueur=None,labyrinthe=None,entitees=None,evenements=None,horloge_cycle=None):
-
+        self.fullscreen = False
         self.greater_teleportation = False
         self.mode_affichage = mode_affichage
         self.difficulte = difficulte
@@ -39,6 +39,10 @@ class Niveau:
         elif self.mode_affichage == distance_max :
             self.LARGEUR_CASE = 20
             self.LARGEUR_MUR = 2
+            
+        #resize pour la démo
+        self.LARGEUR_CASE = 40
+        self.LARGEUR_MUR = 4
 
         if labyrinthe == None:
             if niveau == 0:
@@ -527,7 +531,7 @@ class Niveau:
 
             elif niveau == "demo":
 
-                self.pnj = Pnj_passif((16,0),10000000,(125,255,125),[Replique(["Voilà, c'est la fin de notre","démonstration ! Merci","de votre attention !"],20)])
+                self.pnj = Pnj_passif((16,0),7752451417845444865185618565259654,(125,255,125),[Replique(["Voilà, c'est la fin de notre","démonstration ! Merci","de votre attention !"],20)])
                 monstres = [Fatti([7,17]),Runner(self.lab.getMatrice_cases(),19,19,[10,10]),Slime([17,12])]
                 self.entitees = self.clees + [Potion_de_vision((2,6),self.joueur),Potion_de_visibilite_permanente((4,6),self.joueur),Potion_de_force((2,7),self.joueur),Potion_de_force_permanente((4,7),self.joueur),Potion_de_portee((2,8),self.joueur),Potion_de_portee_permanente((4,8),self.joueur),Potion_de_soin((2,9),self.joueur),Potion_de_soin_permanente((4,9),self.joueur)]
                 self.entitees.append(self.pnj)
@@ -713,9 +717,7 @@ class Niveau:
                     run=False
 
                 if event.type == pygame.VIDEORESIZE:
-                    self.zoom_largeur = event.w//(self.LARGEUR_CASE + self.LARGEUR_MUR)
-                    self.zoom_hauteur = event.h//(self.LARGEUR_CASE + self.LARGEUR_MUR)
-                    self.redraw()
+                    self.resize_all(event.w, event.h)
                     
             self.actions_entitees()
 
@@ -759,6 +761,107 @@ class Niveau:
             evenement.action()
         if as_perdu:
             self.joueur = self.precedent_joueur
+    def resize_all(self, new_hauteur, new_largeur):
+        """
+        Fonction qui redimensionne tous les éléments graphiques
+        Entrées:
+            -la largeur du nouvel écran
+            -la hauteur du nouvel écran
+        """
+        #screen2 = pygame.display.set_mode((new_hauteur,new_largeur),pygame.RESIZABLE)
+        #screen2.fill((125,125,125))
+        
+        #dimension minimum (on ne va pas resize en faisant des rectangles)
+        min_dim = min(new_hauteur, new_largeur)
+        #self.screen = pygame.display.set_mode((new_hauteur,new_largeur),pygame.RESIZABLE)
+        self.screen.fill((125,125,125))
+        #diverses proportions des parties de l'écran
+        proportion_haut = 0.1
+        proportion_milieu = 0.85
+        proportion_bas = 0.05
+        #fractions représentants les diverses tailles absolues (refaire com)
+        frac_case = 10/11
+        frac_mur = 1/11
+        #taille des diverses elts graphiques qui réduisent les espaces dispo
+        taille_bordure = 2
+        #aquisition des nouvelles proportions en px
+        taille_haut = int(proportion_haut * min_dim)
+        taille_milieu = int(proportion_milieu * min_dim)
+        taille_bas = int(proportion_bas * min_dim)
+        taille_milieu = taille_milieu - taille_bas
+
+        taille_vue = taille_milieu - 2*taille_bordure
+        
+        new_tailleCase = int((taille_vue/self.joueur.largeur_vue)*10/11)
+        new_tailleMur = int((taille_vue/self.joueur.largeur_vue)*1/11)
+
+        print("new taille fenetre: "+str(new_largeur)+"   "+str(new_hauteur))
+        """print("new taille haut: "+str(taille_haut))
+        print("new taille milieu: "+str(taille_milieu))
+        print("new taille bas: "+str(taille_bas))
+        print("taille vue joueur "+str(self.joueur.hauteur_vue))
+        print("new taille case: "+str(new_tailleCase))
+        print("new taille mur: "+str(new_tailleMur))"""
+
+        self.LARGEUR_CASE = new_tailleCase
+        self.LARGEUR_MUR = new_tailleMur
+
+        dim_case = (new_tailleCase,new_tailleCase)
+
+        self.lab.tailleCase = self.LARGEUR_CASE
+        self.lab.tailleMur = self.LARGEUR_MUR
+        
+        #on actualise les infos de l'affichage
+        self.affichage.hauteur_HUD = taille_haut
+        self.affichage.decalage_matrice = [5, taille_haut]
+        
+        self.affichage.LARGEUR_MUR = self.LARGEUR_MUR
+        self.affichage.LARGEUR_CASE = self.LARGEUR_CASE
+        self.affichage.TAILLE_CASE = self.LARGEUR_MUR + self.LARGEUR_CASE
+        #self.affichage=Affichage(self.screen,self.mode_affichage,self.LARGEUR_CASE,self.LARGEUR_MUR,self.lab.largeur,self.lab.hauteur)
+        #application des nouvelles proportions aux elts graphiques
+        SKIN_VIDE.tailleMur = self.LARGEUR_MUR 
+        SKIN_PLEIN.tailleCase = self.LARGEUR_CASE
+
+        
+        SKIN_VIDE.resize(dim_case)
+        SKIN_PLEIN.resize(dim_case)
+        
+        SKIN_VIDE_PORTE.resize(dim_case)
+        SKIN_PLEIN_PORTE.resize(dim_case)
+
+        for skin in SKIN_CASES:
+            skin.resize(dim_case)
+        for skin in SKIN_PNJS:
+            skin.resize(dim_case)
+        
+        SKIN_JOUEUR.resize(dim_case)
+        SKIN_ATTAQUE_JOUEUR.resize(dim_case)
+
+        SKIN_FATTI.resize(dim_case)
+        SKIN_SLIME.resize(dim_case)
+        SKIN_RUNNER.resize(dim_case)
+
+        SKIN_POTION_SOIN.resize(dim_case)
+        SKIN_POTION_PORTEE.resize(dim_case)
+        SKIN_POTION_FORCE.resize(dim_case)
+        SKIN_POTION_VISION.resize(dim_case)
+        SKIN_POTION_SUPER_SOIN.resize(dim_case)
+        SKIN_POTION_SUPER_PORTEE.resize(dim_case)
+        SKIN_POTION_SUPER_FORCE.resize(dim_case)
+        SKIN_POTION_SUPER_VISION.resize(dim_case)
+
+        SKIN_CLEE.resize(dim_case)
+
+        SKIN_MANCHE_LANCE.resize(dim_case)
+        SKIN_POINTE_LANCE.resize(dim_case)
+
+        SKIN_STOMP_1.resize(dim_case)
+        SKIN_STOMP_2.resize(dim_case)
+
+        SKIN_CAILLOU.resize(dim_case)
+        
+        
     def generation_meutes(self):
         """
         Fonction qui génère les meutes
@@ -832,17 +935,25 @@ class Niveau:
         #on récupère toutes les touches préssés sous forme de booléen
         keys=pygame.key.get_pressed()
         
-        if keys[pygame.K_q]:
-            self.joueur.consulte_minimap()
+        if keys[pygame.K_a]:
+            self.affichage.affiche = MINIMAP
+            self.joueur.vitesse = self.joueur.vitesse_autres
         elif keys[pygame.K_i]:
-            self.joueur.consulte_inventaire()
-        elif keys[pygame.K_RETURN]:
-            self.joueur.revient()
-        if keys[pygame.K_EQUALS]:
-            self.joueur.precise()
-        if keys[pygame.K_MINUS]:
-            self.joueur.postcise()
-
+            self.affichage.affiche = INVENTAIRE
+            self.joueur.vitesse = self.joueur.vitesse_autres
+        elif keys[pygame.K_RETURN] and (self.affichage.affiche == INVENTAIRE or self.affichage.affiche == MINIMAP):
+            self.affichage.affiche = LABYRINTHE
+            self.joueur.vitesse = self.joueur.vitesse_lab
+        elif keys[pygame.K_F11]:
+            if not(self.fullscreen):
+                self.fullscreen = True
+                self.screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+                print("fullscreen!!")
+            else:
+                self.fullscreen = False
+                self.screen = pygame.display.set_mode((640,600))
+                print("pu fullscreen :(")
+            self.resize_all(self.screen.get_height(),self.screen.get_width())
         if self.affichage.affiche == INVENTAIRE:
             if keys[pygame.K_RIGHT]:
                 self.joueur.inventaire_vers_la_droite()
@@ -850,16 +961,26 @@ class Niveau:
                 self.joueur.inventaire_vers_la_gauche()
             elif keys[pygame.K_SPACE]:
                 self.joueur.utilise_inventaire()
+            elif keys[pygame.K_EQUALS]:
+                self.affichage.affiche = ITEM
+
+        if self.affichage.affiche == ITEM:
+            if keys[pygame.K_MINUS]:
+                self.affichage.affiche = INVENTAIRE
 
         elif self.affichage.affiche == MINIMAP:
             if keys[pygame.K_UP]:
-                self.joueur.minimap_vers_le_haut()
+                self.joueur.minimap.va_vers_le_haut()
             elif keys[pygame.K_DOWN]:
-                self.joueur.minimap_vers_le_bas()
+                self.joueur.minimap.va_vers_le_bas()
             elif keys[pygame.K_RIGHT]:
-                self.joueur.minimap_vers_la_droite()
+                self.joueur.minimap.va_vers_la_droite()
             elif keys[pygame.K_LEFT]:
-                self.joueur.minimap_vers_la_gauche()
+                self.joueur.minimap.va_vers_la_gauche()
+            elif keys[pygame.K_EQUALS]:
+                self.joueur.minimap.rezoom()
+            elif keys[pygame.K_MINUS]:
+                self.joueur.minimap.dezoom()
 
         elif self.affichage.affiche == LABYRINTHE:
             if keys[pygame.K_UP]:
@@ -874,9 +995,9 @@ class Niveau:
                 self.joueur.attaque()
             elif keys[pygame.K_SPACE]:
                 self.joueur.attaque()
-            elif keys[pygame.K_w]:
+            elif keys[pygame.K_z]:
                 self.joueur.attaque_lourde(HAUT)
-            elif keys[pygame.K_a]:
+            elif keys[pygame.K_q]:
                 self.joueur.attaque_lourde(GAUCHE)
             elif keys[pygame.K_s]:
                 self.joueur.attaque_lourde(BAS)
@@ -884,6 +1005,12 @@ class Niveau:
                 self.joueur.attaque_lourde(DROITE)
             elif keys[pygame.K_x]:
                 self.joueur.tentative_interaction()
+
+        elif self.affichage.affiche == DIALOGUE:
+            self.joueur.vitesse = self.joueur.vitesse_autres
+            if keys[pygame.K_RETURN]:
+                self.affichage.pass_replique()
+                self.joueur.vitesse = self.joueur.vitesse_lab
 
 
     def actions_entitees(self):
@@ -906,12 +1033,12 @@ class Niveau:
         self.actualiser_vues_agissants(agissants)
         
         for agissant in agissants:
-            if issubclass(type(agissant),Joueur):
-                self.action_joueur()
-
             if self.horloge_cycle % agissant.getVitesse()==0:
+                if issubclass(type(agissant),Joueur):
+                    self.action_joueur()
 
-#                    agissant.regen_mana()
+
+                    agissant.regen_mana()
                 agissant.soigne_toi()
                 
                 agissant=self.actualiser_donnee(agissant)
@@ -1115,39 +1242,6 @@ class Niveau:
             succes = self.collision.tentative_interaction(agissant,self.entitees)
         elif id_action==PARLER:
             succes = self.affichage.add_dialogue(action)
-        elif id_action==CONSULTER_MINIMAP:
-            self.affichage.affiche = MINIMAP
-            agissant.vitesse = agissant.vitesse_autres
-        elif id_action==CONSULTER_INVENTAIRE:
-            self.affichage.affiche = INVENTAIRE
-            agissant.vitesse = agissant.vitesse_autres
-        elif id_action==PRECISION:
-            if self.affichage.affiche == INVENTAIRE:
-                self.affichage.affiche = ITEM
-            elif self.affichage.affiche == MINIMAP:
-                agissant.minimap.rezoom()
-        elif id_action==POSTCISION:
-            if self.affichage.affiche == ITEM:
-                self.affichage.affiche = INVENTAIRE
-            elif self.affichage.affiche == MINIMAP:
-                agissant.minimap.dezoom()
-        elif id_action==RETOUR:
-            if self.affichage.affiche == DIALOGUE:
-                if self.affichage.pass_replique():
-                    agissant.vitesse = agissant.vitesse_lab
-            else:
-                self.affichage.affiche = LABYRINTHE
-                agissant.vitesse = agissant.vitesse_lab
-        elif id_action==BOUGER_MINIMAP:
-            direction_voulue=action
-            agissant.minimap.deplace_toi(direction_voulue)
-        elif id_action==BOUGER_INVENTAIRE:
-            direction_voulue=action
-            agissant.inventaire.deplace_toi(direction_voulue)
-        elif id_action==UTILISER:
-            if self.affichage.affiche == INVENTAIRE:
-                agissant.inventaire.utilise_item()
-            
         return succes
 
     def traitement_mouvement(self,projectile):

@@ -9,7 +9,6 @@ class Inventaire:
         self.entree_dico = []
         self.item_courant = 0
         self.longueur = 0
-        self.accessible = True
         for item in items:
             self.ramasse_item(item)
         
@@ -110,17 +109,15 @@ class Inventaire:
 
         
 
-    def deplace_toi(self,direction):
-        if direction == DROITE:
-            self.item_courant += 1
-            if self.item_courant >= self.longueur:
-                self.item_courant = 0
+    def vers_la_droite(self):
+        self.item_courant += 1
+        if self.item_courant >= self.longueur:
+            self.item_courant = 0
 
-        elif direction == GAUCHE:
-            self.item_courant -= 1
-            if self.item_courant < 0:
-                self.item_courant = self.longueur-1
-
+    def vers_la_gauche(self):
+        self.item_courant -= 1
+        if self.item_courant < 0:
+            self.item_courant = self.longueur-1
     def getCopie(self):
         """
         Fonction qui copie l'inventaire

@@ -209,6 +209,7 @@ class Labyrinthe:
                 position_x+=self.tailleCase+self.tailleMur
 
         elif mode_affichage == distance_max :
+            #print("position du lab sur l'écran:"+str(position_screen))
             #on voit tout ce qui est accesible à une certaine distance
             joueur_x = position_joueur[0]
             joueur_y = position_joueur[1]
@@ -233,7 +234,7 @@ class Labyrinthe:
         
 
         elif mode_affichage == aveugle :
-            #on ne voit peut de choses
+            #on ne voit que peut de choses
             self.dessine_case(screen,position_joueur,position_screen,largeur,hauteur,position_joueur)
 
             lumiere_droite = Lumiere(position_joueur,DROITE,self)

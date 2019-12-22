@@ -10,7 +10,7 @@ class Case_minimap(Case):
             self.non_vu = (100,100,100)
             self.vu = (200,200,200)
             self.voit = (255,255,255)
-        elif self.mode_minimap == passage :
+        elif self.mode_minimap == PASSAGE :
             self.non_vu = (0,0,0)
             self.vu = (150,150,150)
             self.voit = (255,255,255)
@@ -69,7 +69,7 @@ class Case_minimap(Case):
         for i in range(0,len(self.murs)):
             self.murs[i].tailleMur = 1
     def set_couleur(self):
-        if self.arrivee and (self.mode_minimap == voir_tout or (self.decouvert>0 and mode_affichage == passage) or self.decouvert == 0):
+        if self.arrivee and (self.mode_minimap == voir_tout or (self.decouvert>0 and mode_affichage == PASSAGE) or self.decouvert == 0):
             self.couleur = ARRIVEE
         elif self.decouvert == 0:
             self.couleur = self.voit

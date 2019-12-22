@@ -100,47 +100,6 @@ class Joueur(Agissant):
     def dessine_minimap(self,screen,position_screen,dessine):
         self.minimap.dessine_toi(screen,position_screen,self.position,self.portee_vue,dessine)
 
-    def consulte_minimap(self):
-        if self.minimap.accessible:
-            self.id_next=CONSULTER_MINIMAP
-        else:
-            self.id_next=None
-
-    def consulte_inventaire(self):
-        if self.inventaire.accessible:
-            self.id_next=CONSULTER_INVENTAIRE
-        else:
-            self.id_next=None
-
-    def revient(self):
-        self.id_next = RETOUR
-
-    def precise(self):
-        self.id_next = PRECISION
-
-    def postcise(self):
-        self.id_next = POSTCISION
-
-    def minimap_vers_la_gauche(self):
-        """fonction qui demande d'aller vers la gauche"""
-        self.next_action=GAUCHE
-        self.id_next=BOUGER_MINIMAP
-
-    def minimap_vers_la_droite(self):
-        """fonction qui demande d'aller vers la droite"""
-        self.next_action=DROITE
-        self.id_next=BOUGER_MINIMAP
-
-    def minimap_vers_le_haut(self):
-        """fonction qui demande d'aller vers le haut"""
-        self.next_action=HAUT
-        self.id_next=BOUGER_MINIMAP
-
-    def minimap_vers_le_bas(self):
-        """fonction qui demande d'aller vers le bas"""
-        self.next_action=BAS
-        self.id_next=BOUGER_MINIMAP
-
     def affiche_minimap(self,screen):
         self.minimap.affiche_toi(screen)
 
@@ -148,15 +107,13 @@ class Joueur(Agissant):
         self.inventaire.affiche_toi(screen)
 
     def inventaire_vers_la_droite(self):
-        self.next_action=DROITE
-        self.id_next=BOUGER_INVENTAIRE
+        self.inventaire.vers_la_droite()
 
     def inventaire_vers_la_gauche(self):
-        self.next_action=GAUCHE
-        self.id_next=BOUGER_INVENTAIRE
+        self.inventaire.vers_la_gauche()
 
     def utilise_inventaire(self):
-        self.id_next=UTILISER
+        self.inventaire.utilise_item()
 
     def precise_item(self,screen):
         self.inventaire.precise_item(screen)

@@ -1,4 +1,3 @@
-# coding: utf-8
 import pygame
 from Niveau import *
 from Constantes import *
@@ -6,9 +5,9 @@ from Bouton import *
 from Session import *
 
 niveau = "demo"
-difficulte = HARD
+difficulté = HARD
 mode_affichage = distance_max
-mode_minimap = PASSAGE
+mode_minimap = taille_fixe
 
 #nombres de niveaux (en excluant 0) que l'on a
 nb_max_niv = 100
@@ -53,10 +52,10 @@ def main():
     fenetre = pygame.display.set_mode((640, 600))
     #ici on prend les images contenues dans les fichiers pour les convertir vers pygame
 
-    imgmenu = pygame.image.load("images/ImageMenu.png")
+    imgmenutest = pygame.image.load("images/imgmenutest.png").convert()
     
     #session
-    session = Session(niveau,difficulte,mode_affichage,mode_minimap,nb_max_niv)
+    session = Session(niveau,difficulté,mode_affichage,mode_minimap,nb_max_niv)
 
     loop = True
     
@@ -73,8 +72,8 @@ def main():
         background.fill(BLACK)
         fenetre.blit(background, (0, 0))
 
-        #Ajout du fond dans la fenetre
-        fenetre.blit(imgmenu, (0, 0))
+        #Ajout du fond dans la fenêtre
+        fenetre.blit(imgmenutest, (0, 0))
 
         tuto = Bouton(fenetre,emplacement_Bouton_1[0],emplacement_Bouton_1[1],WHITE,BLACK,"Tutoriel","test",20,130)
         start = Bouton(fenetre,emplacement_Bouton_2[0],emplacement_Bouton_2[1],WHITE,BLACK,"Nouvelle partie","test",20,130)

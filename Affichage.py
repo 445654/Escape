@@ -33,11 +33,13 @@ class Affichage:
         #liste des animations
         self.animations=[]
         #dialogue courant
-        self.diag_cour = None#Replique("J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu J'ai perdu ",20)
+        self.diag_cour = None
         self.text_cour = None
         self.police_cour = None
         self.nb_chars_affichables = 0
         self.ecran_autres = (630,600)
+        #décalage de l'affichage pour centrer le tout
+        self.decalage = [0,0]
     def dessine_frame(self,joueur,labyrinthe,entitees,evenements):
         """
         Fonction qui dessine une frame
@@ -62,13 +64,15 @@ class Affichage:
         if self.taille_ecran_X <= taille_min_ecran_X or self.taille_ecran_Y <= taille_min_ecran_Y :
             self.taille_ecran_X = taille_min_ecran_X + 33
             self.taille_ecran_Y = taille_min_ecran_Y + 33
+            #print("new taille:"+str(self.taille_ecran_X)+"   "+str(self.taille_ecran_Y))
             self.screen = pygame.display.set_mode((self.taille_ecran_X,self.taille_ecran_Y))
-
-        if (self.affiche == MINIMAP or self.affiche == INVENTAIRE or self.affiche == ITEM) and (self.affiche_precedent == LABYRINTHE or self.affiche_precedent == DIALOGUE):
-            self.screen = pygame.display.set_mode(self.ecran_autres)
+        
+        """if (self.affiche == MINIMAP or self.affiche == INVENTAIRE or self.affiche == ITEM) and (self.affiche_precedent == LABYRINTHE or self.affiche_precedent == DIALOGUE):
+            pass
+            #self.screen = pygame.display.set_mode(self.ecran_autres)
         elif (self.affiche_precedent == MINIMAP or self.affiche_precedent == INVENTAIRE or self.affiche_precedent == ITEM) and (self.affiche == LABYRINTHE or self.affiche == DIALOGUE):
             self.screen = pygame.display.set_mode((self.taille_ecran_X,self.taille_ecran_Y))
-            
+        """ 
 
         self.reset_screen(joueur)
         self.dessine_hud(joueur)
@@ -102,9 +106,18 @@ class Affichage:
         pygame.draw.rect(self.screen,(50,50,50),(limite_gauche,limite_haute,limite_droite,limite_basse),2)
 
         joueur_x,joueur_y,position_x,position_y,min_x,max_x,min_y,max_y=self.getConstantes(joueur.getPosition(),[0,0],largeur_vue,hauteur_vue)
-
+        #print("décalage matrice "+str(self.decalage_matrice))
         position_joueur=[joueur_x,joueur_y]
-        self.decalage = [self.decalage_matrice[0] + (self.LARGEUR_MUR+self.LARGEUR_CASE) * self.decalage_gauche,self.decalage_matrice[1] + (self.LARGEUR_MUR+self.LARGEUR_CASE) * self.decalage_haut]
+        self.decalage = [self.decalage_matrice[0] + self.TAILLE_CASE * self.decalage_gauche,self.decalage_matrice[1] + self.TAILLE_CASE * self.decalage_haut]
+        """print("infos affichage:")
+
+        print("decalage matrice "+str(self.decalage_matrice))
+        print("taille case : "+str(self.TAILLE_CASE))
+        print("decalage gauche "+str(self.decalage_gauche))
+        print("decalage haut "+str(self.decalage_haut))
+        
+
+        print("\n\n")"""
         #dire au lab d'afficher la matrice correspondante
         labyrinthe.dessine_toi(self.screen,position_joueur,self.decalage,self.position_vue,largeur_vue,hauteur_vue,self.mode_affichage,self.LARGEUR_CASE,self.LARGEUR_MUR,self.mat_exploree)
         #afficher les entitées
@@ -293,9 +306,7 @@ class Affichage:
                 self.diag_cour = None
                 self.police_cour = None
                 self.affiche = LABYRINTHE
-                res = True
             self.text_cour = None
-        return res
     def dialogue_finit(self):
         """
         Fonction qui teste si le dialogue est finit
@@ -314,7 +325,7 @@ class Affichage:
             -un entier
         """
         #print(self.decalage_matrice[1]+(self.LARGEUR_MUR+self.LARGEUR_CASE)*(portee_joueur+2))
-        return self.decalage_matrice[1]+(self.LARGEUR_MUR+self.LARGEUR_CASE)*(hauteur_vue) + 60
+        return self.decalage_matrice[1]+(self.TAILLE_CASE)*(hauteur_vue) + 60
     def getBottomX(self,largeur_vue):
         """
         Fonction qui renvoie le x correspondant à la droite de l'écran
@@ -323,10 +334,10 @@ class Affichage:
         Sorties:
             -un entier
         """
-        if self.largeur_minimap + 300 >(self.LARGEUR_MUR+self.LARGEUR_CASE)*(largeur_vue):
+        if self.largeur_minimap + 300 >(self.TAILLE_CASE)*(largeur_vue):
             return self.largeur_minimap + 300
         else:
-            return (self.LARGEUR_MUR+self.LARGEUR_CASE)*(largeur_vue)+13
+            return (self.TAILLE_CASE*largeur_vue)+13
     def getConstantes(self,position_joueur,position_screen,largeur,hauteur):
         """
         Fonction qui génère les constantes nécessaires au fonctionnement de l'affichage

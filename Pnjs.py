@@ -30,6 +30,7 @@ class Pnj_passif(Agissant):
         self.indice_replique = 0
         self.skin = len(SKIN_PNJS)
         SKIN_PNJS.append(Skin_pnj("pnj.png",self.couleur))
+        SKIN_PNJS[len(SKIN_PNJS)-1].resize((38,38))
     def interaction(self):
         """
         Fonction qui réagit à une interaction du joueur
