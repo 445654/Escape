@@ -1,5 +1,7 @@
 # Escape
 
+![](images/ImageMenu.png)
+
 ### But du jeu
 
 Vous devez sortir du labyrinthe tout en évitant de vous faire tuer par les divers monstres et obstacles qui se mettront en travers de votre route.
